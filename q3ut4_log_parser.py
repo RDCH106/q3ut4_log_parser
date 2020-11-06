@@ -108,7 +108,7 @@ def parse_log(logpath):
 		if (m):
 			time = int(m.group(1))*60 + int(m.group(2))
 			# New game, make everybody quits
-			for k,v in idd.iteritems():
+			for k,v in idd.items():
 				db_conn.execute(
 					'''update games set stop=? where player = ? and stop = -1''',
 					(time, v))
@@ -157,7 +157,7 @@ def parse_log(logpath):
 				winner = 'BLUE'
 			db_conn.execute('''update rounds set winner=?, red_score=?, blue_score=? where id = ?''', (winner, red_score, blue_score, round_id))
 			
-			for k,v, in team.iteritems():
+			for k,v, in team.items():
 				player = idd[k]
 				color = ''
 				if v==1:
@@ -233,7 +233,7 @@ order by sum(stop-start) desc
 # 
 def frags_repartition():
 	global db_conn
-	print "    <a name=\"11\"><h2>Frags repartition per player</h2></a>"
+	print("    <a name=\"11\"><h2>Frags repartition per player</h2></a>")
 	curs = db_conn.cursor()
 	curs.execute('''
 select fragger, fragged, count(*) as frags 
@@ -245,36 +245,36 @@ order by lower(fragger) asc, count(*) desc
 	for row in curs:
 		if (player != row[0].lower()):
 			if (player):
-				print "    </table>"
-			print """\
+				print("    </table>")
+			print("""\
     <h3>%s fragged:</h3>
     <table>\
-""" % cgi.escape(row[0])
+""" % cgi.escape(row[0]))
 			player = row[0].lower()
 
-		print """\
+		print("""\
       <tr>
         <td style="width: 180px;">%s</td>\
-""" % cgi.escape(row[1])
+""" % cgi.escape(row[1]))
 		
 		bar_str = '        <td><span class="ascii-bar">'
-		for i in xrange(0, row[2]):
+		for i in range(0, row[2]):
 			bar_str = ''.join([bar_str, '| '])
 		bar_str = ''.join([bar_str, '</span>&nbsp;', str(row[2]), '</td>'])
 		
-		print """%s
+		print("""%s
       </tr>\
-""" % bar_str
-	print "    </table>"
+""" % bar_str)
+	print("    </table>")
 
 
 # 
 def death_repartition():
 	global db_conn
-	print """\
+	print("""\
     <a name=\"12\"><h2>Deaths repartition per player</h2></a>
     <table>
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select fragged, fragger, count(*) 
@@ -286,36 +286,36 @@ order by lower(fragged) asc, count(*) desc
 	for row in curs:
 		if (player != row[0].lower()):
 			if (player):
-				print "    </table>"
-			print """\
+				print("    </table>")
+			print("""\
     <h3>%s has been fragged by:</h3>
     <table>\
-""" % cgi.escape(row[0])
+""" % cgi.escape(row[0]))
 			player = row[0].lower()
 
-		print """\
+		print("""\
       <tr>
         <td style="width: 180px;">%s</td>\
-""" % cgi.escape(row[1])
+""" % cgi.escape(row[1]))
 		
 		bar_str = '        <td><span class="ascii-bar">'
-		for i in xrange(0, row[2]):
+		for i in range(0, row[2]):
 			bar_str = ''.join([bar_str, '| '])
 		bar_str = ''.join([bar_str, '</span>&nbsp;', str(row[2]), '</td>'])
 		
-		print """%s
+		print("""%s
       </tr>\
-""" % bar_str
-	print "    </table>"
+""" % bar_str)
+	print("    </table>")
 
 
 #
 def fdratio_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="7"><h2>Frag/death ratio-based ranking</h2></a>
     <ol>\
-"""
+""")
 	players_curs = db_conn.cursor()
 	players_curs.execute('''
 select fragger
@@ -351,18 +351,18 @@ where lower(fragged) = lower(?)
 
 	ratios.sort(key=lambda ratio: ratio[1], reverse=True)
 	for r in ratios:
-		print "      <li>%s (%f)</li>" % (cgi.escape(r[0]), r[1])
+		print("      <li>%s (%f)</li>" % (cgi.escape(r[0]), r[1]))
 
-	print "    </ol>"
+	print("    </ol>")
 
 
 #
 def frag_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="8"><h2>Frag-based ranking</h2></a>
     <ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select fragger, count(*) as frags 
@@ -372,16 +372,16 @@ group by lower(fragger)
 order by count(*) desc, lower(fragger) asc
 ''')
 	for row in curs:
-		print "      <li>%s (%s)</li>" % (row[0], row[1])
-	print "    </ol>"
+		print("      <li>%s (%s)</li>" % (row[0], row[1]))
+	print("    </ol>")
 
 #
 def presence_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="9"><h2>Presence-based ranking</h2></a>
     <ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select player, sum(stop-start) as frags 
@@ -393,13 +393,13 @@ order by sum(stop-start) desc
 		hours = int(row[1]) / 3600
 		minutes = (int(row[1]) - hours*3600) / 60
 		seconds = (int(row[1]) - minutes*60) % 60
-		print "      <li>%s (%i:%.2i:%.2i)</li>" % (row[0], hours, minutes, seconds)
-	print "    </ol>"
+		print("      <li>%s (%i:%.2i:%.2i)</li>" % (row[0], hours, minutes, seconds))
+	print("    </ol>")
 
 # 
 def favorite_weapons():
 	global db_conn
-	print "    <a name=\"13\"><h2>Favorite weapons per player</h2></a>"
+	print("    <a name=\"13\"><h2>Favorite weapons per player</h2></a>")
 	curs = db_conn.cursor()
 	curs.execute('''
 select fragger, weapon, count(*) as frags 
@@ -411,35 +411,35 @@ order by lower(fragger) asc, count(*) desc
 	for row in curs:
 		if (player != row[0].lower()):
 			if (player):
-				print "    </table>"
-			print """\
+				print("    </table>")
+			print("""\
     <h3>%s weapons:</h3>
     <table>\
-""" % cgi.escape(row[0])
+""" % cgi.escape(row[0]))
 			player = row[0].lower()
 
-		print """\
+		print("""\
       <tr>
         <td style="width: 180px;">%s</td>\
-""" % cgi.escape(row[1].replace('UT_MOD_', ''))
+""" % cgi.escape(row[1].replace('UT_MOD_', '')))
 		
 		bar_str = '        <td><span class="ascii-bar">'
-		for i in xrange(0, row[2]):
+		for i in range(0, row[2]):
 			bar_str = ''.join([bar_str, '| '])
 		bar_str = ''.join([bar_str, '</span>&nbsp;', str(row[2]), '</td>'])
 		
-		print """%s
+		print("""%s
       </tr>\
-""" % bar_str
-	print "    </table>"
+""" % bar_str)
+	print("    </table>")
 
 #
 def he_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="5"><h2>Bomber ranking</h2></a>
     <ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select fragger, count(*) as frags 
@@ -449,16 +449,16 @@ group by lower(fragger)
 order by count(*) desc, lower(fragger) asc
 ''')
 	for row in curs:
-		print "      <li>%s (%s)</li>" % (row[0], row[1])
-	print "    </ol>"
+		print("      <li>%s (%s)</li>" % (row[0], row[1]))
+	print("    </ol>")
 
 #
 def sniper_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="6"><h2>Sniper ranking</h2></a>
     <ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select fragger, count(*) as frags 
@@ -468,15 +468,15 @@ group by lower(fragger)
 order by count(*) desc, lower(fragger) asc
 ''')
 	for row in curs:
-		print "      <li>%s (%s)</li>" % (row[0], row[1])
-	print "    </ol>"
+		print("      <li>%s (%s)</li>" % (row[0], row[1]))
+	print("    </ol>")
 
 def capture_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="2"><h2>Capture ranking</h2></a>
     <ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select player, count(*) as flags
@@ -486,16 +486,16 @@ group by lower(player)
 order by count(*) desc, lower(player) asc
 ''')
 	for row in curs:
-		print "      <li>%s (%s)</li>" % (row[0], row[1])
-	print "    </ol>"
+		print("      <li>%s (%s)</li>" % (row[0], row[1]))
+	print("    </ol>")
 
 def attack_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="3"><h2>Attack ranking</h2></a>
 	<paragraph> Number of flags catched </paragraph>
     <ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select player, count(*) as flags
@@ -505,16 +505,16 @@ group by lower(player)
 order by count(*) desc, lower(player) asc
 ''')
 	for row in curs:
-		print "      <li>%s (%s)</li>" % (row[0], row[1])
-	print "    </ol>"
+		print("      <li>%s (%s)</li>" % (row[0], row[1]))
+	print("    </ol>")
 
 def defense_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="4"><h2>Defense ranking</h2></a>
 	<paragraph> Number of flags returned </paragraph>
     <ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select player, count(*) as flags
@@ -524,15 +524,15 @@ group by lower(player)
 order by count(*) desc, lower(player) asc
 ''')
 	for row in curs:
-		print "      <li>%s (%s)</li>" % (row[0], row[1])
-	print "    </ol>"
+		print("      <li>%s (%s)</li>" % (row[0], row[1]))
+	print("    </ol>")
 
 def score_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="1"><h2>Score ranking</h2></a>
     <ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select player, COALESCE(win,0), COALESCE(lost,0), COALESCE(win,0) - COALESCE(lost,0)  as score
@@ -558,15 +558,15 @@ group by lower(player1)
 order by score desc, lower(player1) asc
 ''')
 	for row in curs:
-		print "      <li>%s : %s victories - %s defeats = <b>%s</b></li>" % (row[0], row[1], row[2], row[3])
-	print "    </ol>"
+		print("      <li>%s : %s victories - %s defeats = <b>%s</b></li>" % (row[0], row[1], row[2], row[3]))
+	print("    </ol>")
 
 def chat_ranking():
 	global db_conn
-	print """\
+	print("""\
     <a name="10"><h2>Chat ranking</h2></a>
     <ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''
 select player, count(*) as chats
@@ -575,15 +575,15 @@ group by lower(player)
 order by count(*) desc, lower(player) asc
 ''')
 	for row in curs:
-		print "      <li>%s (%s)</li>" % (row[0], row[1])
-	print "    </ol>"
+		print("      <li>%s (%s)</li>" % (row[0], row[1]))
+	print("    </ol>")
 	
 def best_teammates():
 	global db_conn
-	print """\
+	print("""\
     <a name=\"14\"><h2>Best teammates per player</h2></a>
 	<ol>\
-"""
+""")
 	curs = db_conn.cursor()
 	curs.execute('''\
 SELECT DISTINCT player as player
@@ -595,8 +595,8 @@ ORDER BY player ASC
 		players.append(row[0])
 
 	for player in players:
-		print "<h3>%s :</h3>" % player
-		print "<table>"
+		print("<h3>%s :</h3>" % player)
+		print("<table>")
 		curs.execute('''
 SELECT name1, teamate, oponent
 FROM
@@ -640,12 +640,12 @@ LEFT OUTER JOIN
 ON tt1.name1=tt2.name2
 ''' % (player, player, player, player))
 		for row in curs:
-			print """\
+			print("""\
 <tr>
 <td style="width: 180px;">%s : </td>
 <td> %s </td>
 <td> %s </td>
-</tr>""" % (row[0], row[1], row[2])
+</tr>""" % (row[0], row[1], row[2]))
 	
 
 # Main function
@@ -666,7 +666,7 @@ def main():
 	
 	filter_db(0.05)
 	
-	print """\
+	print("""\
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en-US">
   <head>
@@ -701,7 +701,7 @@ def main():
       <li><a href="#12">Deaths repartition per player</a></li>
       <li><a href="#13">Favorite weapons per player</a></li>
     </ul>\
-"""
+""")
 	score_ranking()
 	capture_ranking()
 	attack_ranking()
@@ -718,11 +718,11 @@ def main():
 	best_teammates()
 	db_conn.close()
 
-	print """\
+	print("""\
     <hr>
   </body>
 </html>\
-"""
+""")
 
 
 if __name__ == '__main__':
